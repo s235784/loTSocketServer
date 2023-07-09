@@ -1,0 +1,11 @@
+spring:
+    profiles:
+        active: prod
+
+server:
+    port: 23579
+
+app:
+    port: 23578
+    key: test
+
