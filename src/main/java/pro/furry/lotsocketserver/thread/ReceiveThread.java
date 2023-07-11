@@ -41,9 +41,7 @@ public class ReceiveThread implements Runnable {
                     String receiveString = builder.substring(0, builder.length() - 2);
                     log.info("接收数据：{}", receiveString);
 
-
-
-                    output.write(receiveString.getBytes(StandardCharsets.UTF_8));
+                    output.write("你好".getBytes(StandardCharsets.UTF_8));
                 }
             }
 
