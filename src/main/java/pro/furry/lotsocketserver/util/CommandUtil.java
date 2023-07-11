@@ -1,5 +1,8 @@
 package pro.furry.lotsocketserver.util;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,6 +52,11 @@ public class CommandUtil {
             return null;
 
         log.info("{}", response.getBody());
-        return "";
+
+        JsonObject responseObject = new Gson().fromJson(response.getBody(), JsonObject.class);
+        JsonArray paths = responseObject.getAsJsonObject("route").getAsJsonArray("paths");
+        JsonArray steps = paths.get(0).getAsJsonObject().getAsJsonArray("steps");
+        JsonObject step = steps.get(0).getAsJsonObject();
+        return step.get("instruction").getAsString();
     }
 }

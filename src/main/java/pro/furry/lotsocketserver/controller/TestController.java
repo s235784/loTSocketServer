@@ -24,7 +24,6 @@ public class TestController {
 
     @GetMapping("/navi")
     public String navigation(@RequestParam String str) {
-        commandUtil.getRoute(str);
-        return "ok";
+        return commandUtil.getRoute(str);
     }
 }
