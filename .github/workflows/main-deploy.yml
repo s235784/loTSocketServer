@@ -1,0 +1,52 @@
+name: Main Build And Deploy CI
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - 'src/**'
+      - 'pom.xml'
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - 'src/**'
+      - 'pom.xml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    - name: Rename target
+      run: |
+        mv target/*.jar target/loTSocketServer.jar
+    - name: Deploy to server
+      uses: easingthemes/ssh-deploy@v4.1.8
+      env:
+        ARGS: '-avz --delete'
+        SOURCE: 'target/loTSocketServer.jar'
+        TARGET: ${{ secrets.FILE_LOCATION_MAIN }}
+        REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+        REMOTE_USER: ${{ secrets.SERVER_USER }}
+        SSH_PRIVATE_KEY: ${{ secrets.SERVER_ACCESS_KEY }}
+    - name: Restart service
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        key: ${{ secrets.SERVER_ACCESS_KEY }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        script_stop: true
+        timeout: 15s
+        script: |
+          docker restart loTSocketServer
+        
