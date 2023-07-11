@@ -29,16 +29,16 @@ public class ReceiveThread implements Runnable {
                 int value;
                 while ((value = reader.read()) != -1) {
                     builder.append((char) value);
-                    if (builder.length() > 2 &&
-                            "\\n".equals(builder.substring(builder.length() - 2))) // \n作为终止符
+                    if (builder.length() > 3 &&
+                            "[n]".equals(builder.substring(builder.length() - 3))) // [n]作为终止符
                         break;
                 }
                 if (value == -1) // 连接关闭
                     break;
 
                 // 处理接收到的数据
-                if (builder.length() > 2) {
-                    String receiveString = builder.substring(0, builder.length() - 2);
+                if (builder.length() > 3) {
+                    String receiveString = builder.substring(0, builder.length() - 3);
                     log.info("接收数据：{}", receiveString);
 
                     output.write("你好".getBytes(StandardCharsets.UTF_8));
