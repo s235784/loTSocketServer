@@ -26,16 +26,25 @@ public class CommandUtil {
     private String amapKey;
 
     public @Nullable String getRoute(@NotNull String param) {
+        if (param.length() < 14) {
+            return "参数不足";
+        }
         int origIndexStart = param.indexOf("orig(");
         int destIndexStart = param.indexOf("dest(");
         if (origIndexStart == -1 || destIndexStart == -1)
-            return null;
+            return "参数格式错误";
 
-        String originTemp = param.substring(origIndexStart + 5);
-        String destTemp = param.substring(destIndexStart + 5);
+        String origin, destination;
+        try {
+            String originTemp = param.substring(origIndexStart + 5);
+            String destTemp = param.substring(destIndexStart + 5);
 
-        String origin = originTemp.substring(0, originTemp.indexOf(")"));
-        String destination = destTemp.substring(0, destTemp.indexOf(")"));
+            origin = originTemp.substring(0, originTemp.indexOf(")"));
+            destination = destTemp.substring(0, destTemp.indexOf(")"));
+        } catch (Exception e) {
+            return "参数格式错误";
+        }
+
         log.info("orig {}, dest {}", origin, destination);
 
         String url = "https://restapi.amap.com/v5/direction/walking";
@@ -49,18 +58,24 @@ public class CommandUtil {
 
         ResponseEntity<String> response = new RestTemplate().getForEntity(uri, String.class);
         if (response.getStatusCode().isError())
-            return null;
+            return "高德API请求失败";
 
         log.info("{}", response.getBody());
 
         JsonObject responseObject = new Gson().fromJson(response.getBody(), JsonObject.class);
         int status = responseObject.getAsJsonPrimitive("status").getAsInt();
         if (status != 1) {
-            return "API请求失败";
+            return "高德API返回错误";
         }
 
         JsonArray paths = responseObject.getAsJsonObject("route").getAsJsonArray("paths");
-        JsonArray steps = paths.get(0).getAsJsonObject().getAsJsonArray("steps");
+        JsonObject firstPath = paths.get(0).getAsJsonObject();
+        int distance = firstPath.getAsJsonPrimitive("distance").getAsInt();
+        if (distance < 10) {
+            return "到达目的地附近";
+        }
+
+        JsonArray steps = firstPath.getAsJsonArray("steps");
         JsonObject step = steps.get(0).getAsJsonObject();
         return step.get("instruction").getAsString();
     }

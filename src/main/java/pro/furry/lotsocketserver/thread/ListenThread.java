@@ -2,6 +2,8 @@ package pro.furry.lotsocketserver.thread;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import pro.furry.lotsocketserver.util.CommandUtil;
+import pro.furry.lotsocketserver.util.SpringContextUtil;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -24,11 +26,12 @@ public class ListenThread implements Runnable{
     @Override
     @SuppressWarnings("InfiniteLoopStatement")
     public void run() {
+        CommandUtil commandUtil = SpringContextUtil.getBean(CommandUtil.class);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             log.info("socket服务端开启，监听端口：{}", port);
             while (true) {
                 Socket socket = serverSocket.accept();
-                executor.execute(new ReceiveThread(socket));
+                executor.execute(new ReceiveThread(socket, commandUtil));
             }
         } catch (IOException e) {
             log.info("socket服务启动异常", e);

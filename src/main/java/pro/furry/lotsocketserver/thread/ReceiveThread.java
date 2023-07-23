@@ -1,6 +1,7 @@
 package pro.furry.lotsocketserver.thread;
 
 import lombok.extern.slf4j.Slf4j;
+import pro.furry.lotsocketserver.util.CommandUtil;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,9 +14,11 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class ReceiveThread implements Runnable {
     private final Socket socket;
+    private final CommandUtil commandUtil;
 
-    public ReceiveThread(Socket socket) {
+    public ReceiveThread(Socket socket, CommandUtil commandUtil) {
         this.socket = socket;
+        this.commandUtil = commandUtil;
     }
 
     @Override
@@ -41,7 +44,12 @@ public class ReceiveThread implements Runnable {
                     String receiveString = builder.substring(0, builder.length() - 3);
                     log.info("接收数据：{}", receiveString);
 
-                    output.write("你好".getBytes(StandardCharsets.UTF_8));
+                    String result = commandUtil.getRoute(receiveString);
+                    if (result == null) {
+                        result = "高德API返回错误";
+                    }
+                    output.write(result.getBytes(StandardCharsets.UTF_8));
+                    log.info("返回数据：{}", result);
                 }
             }
 
