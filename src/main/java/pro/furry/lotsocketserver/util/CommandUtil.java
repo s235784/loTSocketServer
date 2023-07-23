@@ -54,6 +54,11 @@ public class CommandUtil {
         log.info("{}", response.getBody());
 
         JsonObject responseObject = new Gson().fromJson(response.getBody(), JsonObject.class);
+        int status = responseObject.getAsJsonPrimitive("status").getAsInt();
+        if (status != 1) {
+            return "API请求失败";
+        }
+
         JsonArray paths = responseObject.getAsJsonObject("route").getAsJsonArray("paths");
         JsonArray steps = paths.get(0).getAsJsonObject().getAsJsonArray("steps");
         JsonObject step = steps.get(0).getAsJsonObject();
