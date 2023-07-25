@@ -52,11 +52,16 @@ public class ReceiveThread implements Runnable {
                     log.info("返回数据：{}", result);
                 }
             }
-
-            log.info("{} 关闭连接", socket.getRemoteSocketAddress());
-            socket.close();
         } catch (IOException e) {
-            log.error("创建IO流时出现错误", e);
+            log.warn("{} 非正常下线: {}", socket.getRemoteSocketAddress(), e.getMessage());
+        }
+
+        try {
+            if (!socket.isClosed())
+                socket.close();
+            log.info("{} 关闭连接", socket.getRemoteSocketAddress());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

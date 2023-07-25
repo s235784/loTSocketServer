@@ -15,7 +15,7 @@ public class ThreadPoolConfig {
     @Bean("socketTaskExecutor")
     public ThreadPoolTaskExecutor redisTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);
+        executor.setCorePoolSize(5);
         executor.setKeepAliveSeconds(0);
         executor.setAwaitTerminationSeconds(10);
         executor.setThreadNamePrefix("Socket-");

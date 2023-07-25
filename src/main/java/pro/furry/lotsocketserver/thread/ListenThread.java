@@ -31,6 +31,7 @@ public class ListenThread implements Runnable{
             log.info("socket服务端开启，监听端口：{}", port);
             while (true) {
                 Socket socket = serverSocket.accept();
+                socket.setKeepAlive(true);
                 executor.execute(new ReceiveThread(socket, commandUtil));
             }
         } catch (IOException e) {
